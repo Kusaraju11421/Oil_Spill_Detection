@@ -2,39 +2,44 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { DetectionResult } from "../types";
 
 export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionResult> => {
-  // Initializing the AI client with the system-provided API Key
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("API_KEY environment variable is missing. Ensure it is set in Vercel project settings.");
+  }
+
+  // Creating a new instance per call to ensure the latest injected environment variables are used
+  const ai = new GoogleGenAI({ apiKey });
   
-  // Professional technical prompt optimized for speed and U-Net logic
   const prompt = `
-    Perform high-speed maritime oil spill detection on this SAR image.
-    1. Apply simulated Lee filtering for speckle noise reduction.
-    2. Segment low-backscatter regions (potential slicks).
-    3. Calculate IoU and confidence based on feature gradient sharpness.
+    Perform high-speed maritime oil spill detection on this Synthetic Aperture Radar (SAR) image.
+    Follow these mission-critical steps:
+    1. Apply simulated speckle noise reduction for improved signal-to-noise ratio.
+    2. Segment low-backscatter regions characteristic of oil slicks.
+    3. Calculate segmentation IoU and confidence based on gradient edge sharpness.
     
-    Return a technical JSON report:
-    - spillFound: boolean
-    - confidence: 0.0-1.0
-    - iou: 0.0-1.0
-    - areaEstimate: "string with units"
-    - coordinates: [{x, y, w, h}]
-    - description: Technical summary
-    - environmentalImpact: Impact assessment
-    - technicalDetails: {spectralSignature, denoisingStatus, segmentationFidelity}
-    - radarMetrics: [{subject, value, fullMark}]
-    - inferencePath: [{step, probability}]
+    Return a comprehensive technical JSON report following this structure:
+    - spillFound (boolean): True if a potential oil slick is identified.
+    - confidence (float): Numerical certainty between 0.0 and 1.0.
+    - iou (float): Intersection over Union score representing segmentation quality.
+    - areaEstimate (string): Estimated spill size with metric units (e.g., "4.2 km²").
+    - coordinates (array): Bounding boxes for detected slicks [{x, y, w, h}].
+    - description (string): Professional analytical summary.
+    - environmentalImpact (string): Impact level (Low, Moderate, Critical, Catastrophic).
+    - technicalDetails (object): {spectralSignature, denoisingStatus, segmentationFidelity}.
+    - radarMetrics (array): [{subject, value, fullMark}] for diagnostic radar plots.
+    - inferencePath (array): [{step, probability}] mapping the decision process.
   `;
 
   try {
     const response = await ai.models.generateContent({
-      // Switched to Flash for high-speed multimodal performance
       model: 'gemini-3-flash-preview',
-      contents: {
+      contents: [{
+        role: 'user',
         parts: [
           { inlineData: { data: imageBase64.split(',')[1], mimeType: 'image/jpeg' } },
           { text: prompt }
         ]
-      },
+      }],
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -53,7 +58,8 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
                   y: { type: Type.NUMBER },
                   w: { type: Type.NUMBER },
                   h: { type: Type.NUMBER }
-                }
+                },
+                required: ["x", "y", "w", "h"]
               }
             },
             description: { type: Type.STRING },
@@ -64,7 +70,8 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
                 spectralSignature: { type: Type.STRING },
                 denoisingStatus: { type: Type.STRING },
                 segmentationFidelity: { type: Type.NUMBER }
-              }
+              },
+              required: ["spectralSignature", "denoisingStatus", "segmentationFidelity"]
             },
             radarMetrics: {
               type: Type.ARRAY,
@@ -74,7 +81,8 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
                   subject: { type: Type.STRING },
                   value: { type: Type.NUMBER },
                   fullMark: { type: Type.NUMBER }
-                }
+                },
+                required: ["subject", "value", "fullMark"]
               }
             },
             inferencePath: {
@@ -84,7 +92,8 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
                 properties: {
                   step: { type: Type.NUMBER },
                   probability: { type: Type.NUMBER }
-                }
+                },
+                required: ["step", "probability"]
               }
             }
           },
@@ -98,11 +107,16 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
     });
 
     const text = response.text;
-    if (!text) throw new Error("Empty response from analysis engine");
+    if (!text) throw new Error("Null response received from the neural processing core.");
     
     return JSON.parse(text) as DetectionResult;
-  } catch (error) {
-    console.error("Neural Pipeline Execution Failed:", error);
+  } catch (error: any) {
+    console.error("ANALYSIS_ENGINE_FAULT_REPORT:", {
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause,
+      api_key_present: !!process.env.API_KEY
+    });
     throw error;
   }
 };

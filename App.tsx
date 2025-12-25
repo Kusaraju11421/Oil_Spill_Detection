@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  AreaChart, Area, BarChart, Bar, Cell, RadarChart, PolarGrid, PolarAngleAxis, Radar 
+  AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, Radar 
 } from 'recharts';
 import { analyzeOilSpill } from './services/gemini';
 import { DetectionResult } from './types';
@@ -145,8 +145,11 @@ ${JSON.stringify(result.coordinates, null, 2)}
       const res = await analyzeOilSpill(selectedImage);
       setResult(res);
       addLog("MISSION COMPLETED: TELEMETRY LOCKED.");
-    } catch (e) {
-      addLog("CRITICAL FAILURE IN NEURAL LINK.");
+    } catch (e: any) {
+      const errorMsg = e?.message || "Unknown neural core exception";
+      console.error("ANALYSIS_FAULT:", e);
+      addLog(`CRITICAL FAILURE: ${errorMsg}`);
+      addLog("VERIFY API_KEY CONFIGURATION AND SAR INPUT INTEGRITY.");
     } finally {
       setAnalyzing(false);
     }
@@ -372,7 +375,6 @@ ${JSON.stringify(result.coordinates, null, 2)}
         <div className="wave-layer wave-3"></div>
       </div>
 
-      {/* Relocated Created by Tag to Top Right with Increased Size and White Color */}
       <div className={`fixed top-6 right-6 md:right-12 z-[60] text-right pointer-events-none transition-opacity duration-700 ${stage !== 'dashboard' ? 'opacity-100' : 'opacity-30'}`}>
         <p className="text-[9px] text-white font-bold uppercase tracking-[0.4em] mb-0.5">Created by</p>
         <p className="text-[14px] md:text-lg font-folix text-white italic tracking-[0.1em] drop-shadow-[0_0_8px_rgba(255,0,85,0.6)]">Kusaraju</p>
