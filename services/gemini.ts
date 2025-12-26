@@ -1,13 +1,10 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { DetectionResult } from "../types";
 
+// Helper for analyzing oil spill images using Gemini 3
 export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionResult> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API_KEY environment variable is missing. Ensure it is set in Vercel project settings.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Always use the API key directly from process.env.API_KEY as per guidelines
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
     Perform high-speed maritime oil spill detection on this Synthetic Aperture Radar (SAR) image.
@@ -30,16 +27,18 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: [{
-        role: 'user',
+    // Generate content using Gemini 3 Pro for this complex maritime analysis task
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: {
         parts: [
           { inlineData: { data: imageBase64.split(',')[1], mimeType: 'image/jpeg' } },
           { text: prompt }
         ]
-      }],
+      },
       config: {
+        // High-quality reasoning for complex maritime detection tasks
+        thinkingConfig: { thinkingBudget: 32768 },
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,

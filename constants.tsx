@@ -1,17 +1,17 @@
-
 import { TrainingMetricPoint } from './types';
 
 export const COLORS = {
-  primary: '#ff0055', // Obsidian Rose
-  secondary: '#00e676', // Teal
-  danger: '#ff1744',
-  warning: '#ff9100',
-  dark: '#0a0a0a',
-  surface: '#141414',
-  border: '#222222'
+  primary: '#0055FF', // Electric Blue
+  secondary: '#E4E4E4', // Silver Mist
+  danger: '#FF0000', // Pure Red
+  warning: '#FF4D00', // Neon Orange (Accent)
+  dark: '#000000', // Pure Black
+  surface: '#0A0A0A', // Near Black Surface
+  lightGray: '#94A3B8', 
+  gray: '#475569', 
+  border: '#1E293B' 
 };
 
-// Use TrainingMetricPoint type to correctly type the historical data array
 export const MOCK_TRAINING_HISTORY: TrainingMetricPoint[] = [
   { epoch: 1, trainLoss: 0.85, valIoU: 0.42, valAccuracy: 78.5 },
   { epoch: 5, trainLoss: 0.62, valIoU: 0.58, valAccuracy: 84.2 },

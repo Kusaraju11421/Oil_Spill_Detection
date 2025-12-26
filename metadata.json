@@ -1,5 +1,5 @@
 {
-  "name": "Sentinel Oil Spill Detector",
+  "name": "Oil Spill Detector",
   "description": "A high-fidelity environmental monitoring dashboard for oil spill detection and SAR image analysis, inspired by U-Net segmentation models.",
   "requestFramePermissions": [
     "camera"
