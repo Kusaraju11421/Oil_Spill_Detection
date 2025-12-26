@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -97,11 +98,11 @@ const App: React.FC = () => {
 
   const switchMenu = (menu: string) => {
     setActiveMenu(menu);
-    addLog(`Navigating to ${menu}`);
+    // addLog(`Navigating to ${menu}`);
   };
 
   const addLog = (msg: string) => {
-    setLogs(prev => [msg, ...prev].slice(0, 10));
+    setLogs(prev => [msg, ...prev].slice(0, 15));
   };
 
   const toggleChart = (chart: string) => {
@@ -122,9 +123,11 @@ const App: React.FC = () => {
       const overlay = await generateOverlay(selectedImage, res.coordinates);
       setResult({ ...res, visuals: { input: selectedImage, gtMask: maskImage, predictedMask, overlay } });
       setActiveMenu('View Results');
-      addLog("DETECTION SUCCESSFUL.");
+      addLog("DETECTION SUCCESSFUL. MISSION DATA LOADED.");
     } catch (e: any) {
-      addLog(`ERROR: ${e.message}`);
+      console.error(e);
+      addLog(`FATAL ERROR: ${e.message || "Unknown error occurred during analysis."}`);
+      alert(`Fault in Analysis Engine: ${e.message || "Please check connection or API status."}`);
     } finally {
       setAnalyzing(false);
     }
@@ -544,34 +547,37 @@ const App: React.FC = () => {
 
              <div className="w-full">
                {activeMenu === 'Upload Images' && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                   <div 
-                     className="glass-panel p-6 md:p-12 rounded-3xl md:rounded-[2.5rem] flex flex-col items-center justify-center min-h-[300px] md:min-h-[450px] cursor-pointer group hover:border-[#0055FF]/40 transition-all" 
-                     onClick={() => fileInputRef.current?.click()}
-                   >
-                     {selectedImage ? <img src={selectedImage} className="max-h-64 md:max-h-96 rounded-xl md:rounded-2xl object-contain shadow-2xl" /> : (
-                       <div className="text-center opacity-30 group-hover:opacity-80 transition-opacity">
-                         <i className="fa-solid fa-satellite text-4xl md:text-7xl mb-4 md:mb-8 text-[#0055FF]"></i>
-                         <h3 className="text-sm md:text-lg font-cinzel font-bold text-white uppercase tracking-widest">Input SAR Sensor</h3>
-                         <p className="text-[8px] md:text-[10px] mt-2 md:mt-4 text-[#94A3B8] tracking-[0.2em]">Awaiting Uplink</p>
-                       </div>
-                     )}
-                     <input type="file" ref={fileInputRef} hidden onChange={async e => e.target.files?.[0] && setSelectedImage(await fileToBase64(e.target.files[0]))} />
+                 <div className="space-y-10">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+                     <div 
+                       className="glass-panel p-6 md:p-12 rounded-3xl md:rounded-[2.5rem] flex flex-col items-center justify-center min-h-[300px] md:min-h-[450px] cursor-pointer group hover:border-[#0055FF]/40 transition-all" 
+                       onClick={() => fileInputRef.current?.click()}
+                     >
+                       {selectedImage ? <img src={selectedImage} className="max-h-64 md:max-h-96 rounded-xl md:rounded-2xl object-contain shadow-2xl" /> : (
+                         <div className="text-center opacity-30 group-hover:opacity-80 transition-opacity">
+                           <i className="fa-solid fa-satellite text-4xl md:text-7xl mb-4 md:mb-8 text-[#0055FF]"></i>
+                           <h3 className="text-sm md:text-lg font-cinzel font-bold text-white uppercase tracking-widest">Input SAR Sensor</h3>
+                           <p className="text-[8px] md:text-[10px] mt-2 md:mt-4 text-[#94A3B8] tracking-[0.2em]">Awaiting Uplink</p>
+                         </div>
+                       )}
+                       <input type="file" ref={fileInputRef} hidden onChange={async e => e.target.files?.[0] && setSelectedImage(await fileToBase64(e.target.files[0]))} />
+                     </div>
+                     <div 
+                       className="glass-panel p-6 md:p-12 rounded-3xl md:rounded-[2.5rem] flex flex-col items-center justify-center min-h-[300px] md:min-h-[450px] cursor-pointer group hover:border-white/40 transition-all" 
+                       onClick={() => maskInputRef.current?.click()}
+                     >
+                       {maskImage ? <img src={maskImage} className="max-h-64 md:max-h-96 rounded-xl md:rounded-2xl object-contain shadow-2xl" /> : (
+                         <div className="text-center opacity-30 group-hover:opacity-80 transition-opacity">
+                           <i className="fa-solid fa-file-shield text-4xl md:text-7xl mb-4 md:mb-8 text-[#E4E4E4]"></i>
+                           <h3 className="text-sm md:text-lg font-cinzel font-bold text-white uppercase tracking-widest">Reference Truth</h3>
+                           <p className="text-[8px] md:text-[10px] mt-2 md:mt-4 text-[#94A3B8] tracking-[0.2em]">Validation Layer</p>
+                         </div>
+                       )}
+                       <input type="file" ref={maskInputRef} hidden onChange={async e => e.target.files?.[0] && setMaskImage(await fileToBase64(e.target.files[0]))} />
+                     </div>
                    </div>
-                   <div 
-                     className="glass-panel p-6 md:p-12 rounded-3xl md:rounded-[2.5rem] flex flex-col items-center justify-center min-h-[300px] md:min-h-[450px] cursor-pointer group hover:border-white/40 transition-all" 
-                     onClick={() => maskInputRef.current?.click()}
-                   >
-                     {maskImage ? <img src={maskImage} className="max-h-64 md:max-h-96 rounded-xl md:rounded-2xl object-contain shadow-2xl" /> : (
-                       <div className="text-center opacity-30 group-hover:opacity-80 transition-opacity">
-                         <i className="fa-solid fa-file-shield text-4xl md:text-7xl mb-4 md:mb-8 text-[#E4E4E4]"></i>
-                         <h3 className="text-sm md:text-lg font-cinzel font-bold text-white uppercase tracking-widest">Reference Truth</h3>
-                         <p className="text-[8px] md:text-[10px] mt-2 md:mt-4 text-[#94A3B8] tracking-[0.2em]">Validation Layer</p>
-                       </div>
-                     )}
-                     <input type="file" ref={maskInputRef} hidden onChange={async e => e.target.files?.[0] && setMaskImage(await fileToBase64(e.target.files[0]))} />
-                   </div>
-                   <div className="md:col-span-2 flex justify-center mt-8 md:mt-12">
+
+                   <div className="flex flex-col items-center gap-8">
                      <button 
                        onClick={runUnet} 
                        disabled={!selectedImage || analyzing} 
@@ -579,6 +585,24 @@ const App: React.FC = () => {
                      >
                        {analyzing ? analysisStatus : "START MISSION CORE"}
                      </button>
+
+                     {/* Tactical Console for Logs & Errors */}
+                     <div className="w-full glass-panel p-6 rounded-2xl bg-black/80 border border-white/5 overflow-hidden">
+                        <div className="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                           <span className="text-[10px] font-bold text-[#0055FF] uppercase tracking-widest">Tactical Console</span>
+                           <span className="text-[8px] text-white/20 uppercase">Realtime Feed</span>
+                        </div>
+                        <div className="space-y-1.5 h-32 overflow-y-auto custom-scrollbar font-mono text-[9px] md:text-[11px]">
+                           {logs.length > 0 ? logs.map((log, idx) => (
+                             <div key={idx} className={`${log.includes('FATAL ERROR') || log.includes('ERROR') ? 'text-red-500' : 'text-blue-400'} opacity-90`}>
+                               <span className="text-white/20 mr-2">[{new Date().toLocaleTimeString()}]</span>
+                               <span>{log}</span>
+                             </div>
+                           )) : (
+                             <div className="text-white/10 italic">Awaiting instructions...</div>
+                           )}
+                        </div>
+                     </div>
                    </div>
                  </div>
                )}
