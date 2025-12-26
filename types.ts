@@ -27,6 +27,13 @@ export interface DetectionResult {
   };
   radarMetrics: MetricPoint[];
   inferencePath: { step: number; probability: number }[];
+  // Visual assets generated on-the-fly
+  visuals?: {
+    input: string;
+    gtMask: string | null;
+    predictedMask: string;
+    overlay: string;
+  };
 }
 
 export interface TrainingMetricPoint {

@@ -7,27 +7,26 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
     throw new Error("API_KEY environment variable is missing. Ensure it is set in Vercel project settings.");
   }
 
-  // Creating a new instance per call to ensure the latest injected environment variables are used
   const ai = new GoogleGenAI({ apiKey });
   
   const prompt = `
     Perform high-speed maritime oil spill detection on this Synthetic Aperture Radar (SAR) image.
-    Follow these mission-critical steps:
-    1. Apply simulated speckle noise reduction for improved signal-to-noise ratio.
-    2. Segment low-backscatter regions characteristic of oil slicks.
-    3. Calculate segmentation IoU and confidence based on gradient edge sharpness.
+    Mission Requirements:
+    1. Identify all low-backscatter regions (dark patches) likely to be oil slicks.
+    2. Provide coordinates as PERCENTAGES (0 to 100) relative to image dimensions.
+    3. Calculate IoU and confidence based on edge sharpness and context.
     
-    Return a comprehensive technical JSON report following this structure:
-    - spillFound (boolean): True if a potential oil slick is identified.
-    - confidence (float): Numerical certainty between 0.0 and 1.0.
-    - iou (float): Intersection over Union score representing segmentation quality.
-    - areaEstimate (string): Estimated spill size with metric units (e.g., "4.2 km²").
-    - coordinates (array): Bounding boxes for detected slicks [{x, y, w, h}].
-    - description (string): Professional analytical summary.
-    - environmentalImpact (string): Impact level (Low, Moderate, Critical, Catastrophic).
+    Return a technical JSON report:
+    - spillFound (boolean): True if slicks are detected.
+    - confidence (float): 0.0 to 1.0.
+    - iou (float): 0.0 to 1.0.
+    - areaEstimate (string): Metric estimate (e.g., "1.5 km²").
+    - coordinates (array): [{x, y, w, h}] where all values are 0-100.
+    - description (string): Analytical summary.
+    - environmentalImpact (string): Impact level (Low, Moderate, Critical).
     - technicalDetails (object): {spectralSignature, denoisingStatus, segmentationFidelity}.
-    - radarMetrics (array): [{subject, value, fullMark}] for diagnostic radar plots.
-    - inferencePath (array): [{step, probability}] mapping the decision process.
+    - radarMetrics (array): [{subject, value, fullMark}] for radar charts.
+    - inferencePath (array): [{step, probability}] mapping the process.
   `;
 
   try {
@@ -111,12 +110,7 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
     
     return JSON.parse(text) as DetectionResult;
   } catch (error: any) {
-    console.error("ANALYSIS_ENGINE_FAULT_REPORT:", {
-      message: error.message,
-      stack: error.stack,
-      cause: error.cause,
-      api_key_present: !!process.env.API_KEY
-    });
+    console.error("ANALYSIS_ENGINE_FAULT_REPORT:", error);
     throw error;
   }
 };
