@@ -1,9 +1,7 @@
 
-export interface Coordinate {
+export interface Point {
   x: number;
   y: number;
-  w: number;
-  h: number;
 }
 
 export interface MetricPoint {
@@ -17,7 +15,9 @@ export interface DetectionResult {
   confidence: number;
   iou: number;
   areaEstimate: string;
-  coordinates: Coordinate[];
+  groundTruthPolygons: Point[][]; 
+  predictedPolygons: Point[][];
+  landPolygons: Point[][]; // Polygons for "other features" to be rendered in Green
   description: string;
   environmentalImpact: string;
   technicalDetails: {
@@ -27,12 +27,11 @@ export interface DetectionResult {
   };
   radarMetrics: MetricPoint[];
   inferencePath: { step: number; probability: number }[];
-  // Visual assets generated on-the-fly
   visuals?: {
-    input: string;
-    gtMask: string | null;
-    predictedMask: string;
-    overlay: string;
+    input: string;      
+    mask: string;       // Image 2: Ground Truth (Black Spill, Green Land, White Water)
+    predicted: string;  // Image 3: Predicted Mask (Black Spill, White Background)
+    overlay: string;    // Image 4: Final Overlay (Green Tint + Grey Spill)
   };
 }
 
