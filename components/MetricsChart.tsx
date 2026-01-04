@@ -2,12 +2,12 @@
 import React from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-  AreaChart, Area, BarChart, Bar, Cell, ScatterChart, Scatter, ZAxis, ComposedChart
+  AreaChart, Area, BarChart, Bar, Cell, ScatterChart, Scatter, ZAxis, ComposedChart, ReferenceLine
 } from 'recharts';
 import { MOCK_TRAINING_HISTORY, COLORS } from '../constants';
 import { DetectionResult } from '../types';
 
-export const PerformanceChart: React.FC = () => {
+export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = ({ result }) => {
   return (
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -45,6 +45,14 @@ export const PerformanceChart: React.FC = () => {
             fill="url(#colorIoU)" 
             strokeWidth={3}
           />
+          {result && (
+            <ReferenceLine 
+              y={result.iou} 
+              stroke={COLORS.primary} 
+              strokeDasharray="3 3" 
+              label={{ position: 'top', value: 'Current Mission', fill: COLORS.primary, fontSize: 10 }} 
+            />
+          )}
           <Area 
             type="monotone" 
             dataKey="trainLoss" 
@@ -60,12 +68,26 @@ export const PerformanceChart: React.FC = () => {
   );
 };
 
-export const MetricsBarChart: React.FC = () => {
+export const MetricsBarChart: React.FC<{ result?: DetectionResult | null }> = ({ result }) => {
+  // Use real result data if available, otherwise fallback to final mock point
   const final = MOCK_TRAINING_HISTORY[MOCK_TRAINING_HISTORY.length - 1];
+  
   const data = [
-    { name: 'Train Loss', value: final.trainLoss, color: COLORS.danger },
-    { name: 'Val IoU', value: final.valIoU, color: COLORS.secondary },
-    { name: 'Val Accuracy', value: final.valAccuracy / 100, color: COLORS.primary }
+    { 
+      name: 'Model Confidence', 
+      value: result ? result.confidence : final.valAccuracy / 100, 
+      color: COLORS.primary 
+    },
+    { 
+      name: 'Segmentation IoU', 
+      value: result ? result.iou : final.valIoU, 
+      color: COLORS.secondary 
+    },
+    { 
+      name: 'Fidelity Score', 
+      value: result ? result.technicalDetails.segmentationFidelity : 0.85, 
+      color: COLORS.warning 
+    }
   ];
 
   return (
@@ -74,7 +96,7 @@ export const MetricsBarChart: React.FC = () => {
         <BarChart layout="vertical" data={data} margin={{ left: 40, right: 30 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
           <XAxis type="number" domain={[0, 1]} hide />
-          <YAxis type="category" dataKey="name" stroke="#f8fafc" fontSize={12} width={100} />
+          <YAxis type="category" dataKey="name" stroke="#f8fafc" fontSize={10} width={100} />
           <Tooltip 
              contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
           />
@@ -107,19 +129,32 @@ export const ScatterPathChart: React.FC<{ result: DetectionResult }> = ({ result
   );
 };
 
-export const HybridMetricChart: React.FC = () => {
+export const HybridMetricChart: React.FC<{ result?: DetectionResult | null }> = ({ result }) => {
+  // If we have a result, we show the training history but highlight the current mission's performance relative to it
+  const data = MOCK_TRAINING_HISTORY.map((item, idx) => ({
+    ...item,
+    currentMissionIoU: result ? result.iou : null,
+    currentConfidence: result && idx === MOCK_TRAINING_HISTORY.length - 1 ? result.confidence * 100 : null
+  }));
+
   return (
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={MOCK_TRAINING_HISTORY}>
+        <ComposedChart data={data}>
           <CartesianGrid stroke="#334155" vertical={false} />
           <XAxis dataKey="epoch" stroke="#94a3b8" fontSize={10} />
           <YAxis yAxisId="left" stroke="#94a3b8" fontSize={10} />
           <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={10} />
           <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none' }} />
           <Legend />
-          <Bar yAxisId="left" dataKey="valAccuracy" name="Accuracy %" fill={COLORS.primary} fillOpacity={0.6} radius={[4, 4, 0, 0]} />
-          <Line yAxisId="right" type="monotone" dataKey="trainLoss" name="Loss Curve" stroke={COLORS.danger} strokeWidth={3} dot={{ r: 4 }} />
+          <Bar yAxisId="left" dataKey="valAccuracy" name="History Accuracy %" fill={COLORS.primary} fillOpacity={0.3} radius={[4, 4, 0, 0]} />
+          {result && (
+             <Line yAxisId="left" type="monotone" dataKey="currentConfidence" name="Current Confidence" stroke={COLORS.warning} strokeWidth={4} dot={{ r: 8, fill: COLORS.warning }} />
+          )}
+          <Line yAxisId="right" type="monotone" dataKey="trainLoss" name="Model Loss History" stroke={COLORS.danger} strokeWidth={2} dot={{ r: 4 }} />
+          {result && (
+            <ReferenceLine yAxisId="left" y={result.iou * 100} stroke={COLORS.secondary} label="Mission IoU" strokeDasharray="3 3" />
+          )}
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -128,10 +163,10 @@ export const HybridMetricChart: React.FC = () => {
 
 export const AreaDensityChart: React.FC<{ result: DetectionResult }> = ({ result }) => {
   // Generate a bell-curve like distribution based on the spill area for visual density
+  const areaValue = parseFloat(result.areaEstimate.replace(/[^0-9.]/g, '')) || 50;
   const densityData = Array.from({ length: 20 }, (_, i) => {
     const x = i - 10;
-    const baseValue = parseFloat(result.areaEstimate) || 50;
-    const density = Math.exp(-(x * x) / 20) * baseValue;
+    const density = Math.exp(-(x * x) / (areaValue / 5)) * areaValue;
     return { name: i, density: density };
   });
 

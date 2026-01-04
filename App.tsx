@@ -315,10 +315,10 @@ const App: React.FC = () => {
                    </div>
                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                       {activeCharts.includes('History') && (
-                        <div className="glass-panel p-10 rounded-[2.5rem] border-white/5"><h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-10">Training Progression</h3><PerformanceChart /></div>
+                        <div className="glass-panel p-10 rounded-[2.5rem] border-white/5"><h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-10">Training Progression</h3><PerformanceChart result={result} /></div>
                       )}
                       {activeCharts.includes('Metrics') && (
-                        <div className="glass-panel p-10 rounded-[2.5rem] border-white/5"><h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-10">Final Fidelity Metrics</h3><MetricsBarChart /></div>
+                        <div className="glass-panel p-10 rounded-[2.5rem] border-white/5"><h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-10">Final Fidelity Metrics</h3><MetricsBarChart result={result} /></div>
                       )}
                       {activeCharts.includes('Radar Signature') && (
                         <div className="glass-panel p-10 rounded-[2.5rem] border-white/5 flex flex-col items-center">
@@ -339,7 +339,7 @@ const App: React.FC = () => {
                       {activeCharts.includes('Hybrid View') && (
                         <div className="glass-panel p-10 rounded-[2.5rem] border-white/5 flex flex-col items-center">
                            <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-10 w-full text-left">Hybrid Metric Correlation</h3>
-                           <HybridMetricChart />
+                           <HybridMetricChart result={result} />
                         </div>
                       )}
                       {activeCharts.includes('Area Density') && (
