@@ -10,18 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Lexend:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-          --neon-blue: #0055FF;
-          --deep-blue: #002266;
-          --neon-red: #D00000;
-          --silver: #64748B;
-          --pure-black: #FFFFFF;
-          --glass-bg: rgba(255, 255, 255, 0.7);
-          --branding-gradient: linear-gradient(to bottom, var(--neon-blue) 25%, #475569 100%);
+          --neon-orange: #F97316;
+          --navy-blue: #001F3F;
+          --pure-black: #000000;
+          --neon-red: #EF4444;
+          --light-green: #4ADE80;
+          --glass-bg: rgba(0, 31, 63, 0.4);
+          --branding-gradient: linear-gradient(to bottom, var(--neon-orange) 25%, var(--neon-red) 100%);
         }
         body {
             font-family: 'Lexend', sans-serif;
             background: var(--pure-black);
-            color: #1E293B;
+            color: #F1F5F9;
             overflow-x: hidden;
             margin: 0;
             -webkit-font-smoothing: antialiased;
@@ -32,12 +32,11 @@
         .landing-background {
           position: fixed;
           inset: 0;
-          background: #F8FAFC;
+          background: var(--pure-black);
           overflow: hidden;
           z-index: 0;
         }
 
-        /* Thin Blue Wave Animation adjusted for White Theme */
         .wave-container {
           position: absolute;
           inset: 0;
@@ -53,7 +52,7 @@
           left: -50%;
           width: 200%;
           height: 1px;
-          background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+          background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
           animation: flowing-thin-wave 20s ease-in-out infinite;
           opacity: 0;
           filter: blur(1px);
@@ -62,51 +61,41 @@
         .fluid-wave-1 {
           top: 35%;
           animation-duration: 18s;
-          background: linear-gradient(90deg, transparent, var(--deep-blue), var(--neon-blue), transparent);
-          opacity: 0.15;
+          background: linear-gradient(90deg, transparent, var(--navy-blue), var(--neon-orange), transparent);
+          opacity: 0.4;
         }
         
         .fluid-wave-2 {
           top: 48%;
           animation-duration: 25s;
           animation-delay: -5s;
-          background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
-          opacity: 0.1;
+          background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+          opacity: 0.2;
         }
 
         .fluid-wave-3 {
           top: 62%;
           animation-duration: 30s;
           animation-delay: -12s;
-          background: linear-gradient(90deg, transparent, var(--deep-blue), transparent);
-          opacity: 0.2;
-        }
-
-        .fluid-wave-4 {
-          top: 42%;
-          animation-duration: 22s;
-          animation-delay: -3s;
-          background: linear-gradient(90deg, transparent, #00000008, var(--neon-blue), transparent);
-          opacity: 0.1;
-          height: 2px;
+          background: linear-gradient(90deg, transparent, var(--navy-blue), transparent);
+          opacity: 0.5;
         }
 
         @keyframes flowing-thin-wave {
           0% { transform: translateX(-10%) translateY(0) scaleX(0.9); opacity: 0; }
-          20% { opacity: 0.3; }
-          50% { transform: translateX(5%) translateY(-40px) scaleX(1.1); opacity: 0.5; }
-          80% { opacity: 0.3; }
+          20% { opacity: 0.6; }
+          50% { transform: translateX(5%) translateY(-40px) scaleX(1.1); opacity: 0.8; }
+          80% { opacity: 0.6; }
           100% { transform: translateX(10%) translateY(0) scaleX(0.9); opacity: 0; }
         }
 
-        /* Ripple Animation adjusted for visibility on light bg */
         .spread-ripple {
           position: absolute;
           top: 50%;
           left: 50%;
           width: 80vh;
           height: 80vh;
-          border: 1px solid rgba(0, 85, 255, 0.1);
+          border: 1px solid rgba(249, 115, 22, 0.1);
           border-radius: 50%;
           transform: translate(-50%, -50%) scale(0);
           animation: wave-spread 10s cubic-bezier(0.2, 0.5, 0.3, 1) infinite;
@@ -114,11 +103,10 @@
           z-index: 0;
         }
         .spread-ripple-2 { animation-delay: -3.3s; }
-        .spread-ripple-3 { animation-delay: -6.6s; }
 
         @keyframes wave-spread {
           0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
-          20% { opacity: 0.3; }
+          20% { opacity: 0.2; }
           100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
 
@@ -129,8 +117,8 @@
           top: -25%;
           left: -25%;
           background: 
-            radial-gradient(circle at 30% 20%, rgba(0, 85, 255, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 70% 80%, rgba(200, 220, 255, 0.2) 0%, transparent 50%);
+            radial-gradient(circle at 30% 20%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 80%, rgba(0, 31, 63, 0.3) 0%, transparent 50%);
           filter: blur(120px);
           animation: mesh-move 30s ease-in-out infinite alternate;
         }
@@ -144,53 +132,47 @@
           position: absolute;
           inset: 0;
           background-image: 
-            linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-          background-size: 100px 100px;
-          opacity: 0.5;
+            linear-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
+          background-size: 80px 80px;
+          opacity: 0.3;
           z-index: 3;
         }
 
         .glass-panel { 
           background: var(--glass-bg); 
           backdrop-filter: blur(25px); 
-          border: 1px solid rgba(0, 85, 255, 0.1);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(249, 115, 22, 0.1);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
-        .neon-btn-blue {
-          background: rgba(0, 85, 255, 0.03);
-          border: 1px solid rgba(0, 85, 255, 0.3);
-          color: var(--neon-blue);
+        .neon-btn-orange {
+          background: rgba(249, 115, 22, 0.05);
+          border: 1px solid rgba(249, 115, 22, 0.3);
+          color: var(--neon-orange);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-weight: 600;
         }
-        .neon-btn-blue:hover {
-          background: rgba(0, 85, 255, 0.08);
-          border-color: var(--neon-blue);
-          box-shadow: 0 5px 20px rgba(0, 85, 255, 0.15);
+        .neon-btn-orange:hover {
+          background: rgba(249, 115, 22, 0.1);
+          border-color: var(--neon-orange);
+          box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
         }
 
         .menu-item {
           transition: all 0.3s ease;
           border-left: 4px solid transparent;
-          color: #64748B;
+          color: #94A3B8;
         }
         .menu-item.active {
-          background: linear-gradient(90deg, rgba(0, 85, 255, 0.08) 0%, transparent 100%);
-          border-left: 4px solid var(--neon-blue);
-          color: var(--neon-blue);
+          background: linear-gradient(90deg, rgba(249, 115, 22, 0.15) 0%, transparent 100%);
+          border-left: 4px solid var(--neon-orange);
+          color: var(--neon-orange);
           font-weight: 600;
         }
 
-        /* Responsive menu scrollbar hide */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .branding-gradient-text {
           background: var(--branding-gradient);
@@ -206,21 +188,10 @@
           100% { transform: translateX(100%); }
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #F1F5F9;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #CBD5E1;
-          border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: var(--neon-blue);
-        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-orange); }
     </style>
 <script type="importmap">
 {
