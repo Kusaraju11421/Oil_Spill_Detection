@@ -4,38 +4,54 @@ import { COLORS } from "../constants";
 
 /**
  * Generates a simple SVG for the Training Performance Area Chart
+ * Matches the UI PerformanceChart (plotted with valIoU and trainLoss)
  */
-export const generatePerformanceSvg = (history: TrainingMetricPoint[]): string => {
+export const generatePerformanceSvg = (history: TrainingMetricPoint[], result?: DetectionResult | null): string => {
   const width = 800;
   const height = 300;
   const padding = 40;
   const chartWidth = width - padding * 2;
   const chartHeight = height - padding * 2;
 
-  const maxVal = 100;
+  // Since it's IoU and Loss, scale is roughly 0 to 1.0
+  const maxVal = 1.0;
   const getX = (i: number) => padding + (i / (history.length - 1)) * chartWidth;
   const getY = (val: number) => height - padding - (val / maxVal) * chartHeight;
 
-  // Paths
+  // Draw valIoU Area
   let areaPath = `M ${getX(0)} ${height - padding}`;
-  let linePath = `M ${getX(0)} ${getY(history[0].valAccuracy)}`;
-  
   history.forEach((point, i) => {
-    const x = getX(i);
-    const y = getY(point.valAccuracy);
-    areaPath += ` L ${x} ${y}`;
-    linePath += ` L ${x} ${y}`;
+    areaPath += ` L ${getX(i)} ${getY(point.valIoU)}`;
   });
-  
   areaPath += ` L ${getX(history.length - 1)} ${height - padding} Z`;
+
+  // Draw current mission reference line if available
+  let missionRefLine = '';
+  if (result) {
+    const missionY = getY(result.iou);
+    missionRefLine = `
+      <line x1="${padding}" y1="${missionY}" x2="${width - padding}" y2="${missionY}" stroke="${COLORS.primary}" stroke-width="2" stroke-dasharray="5,5" />
+      <text x="${width - padding - 100}" y="${missionY - 5}" fill="${COLORS.primary}" font-size="10" font-weight="bold">CURRENT MISSION IoU</text>
+    `;
+  }
 
   return `
     <svg width="100%" height="200" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#050505" />
-      <path d="${areaPath}" fill="${COLORS.primary}" fill-opacity="0.2" />
-      <path d="${linePath}" fill="none" stroke="${COLORS.primary}" stroke-width="3" />
-      <text x="${padding}" y="${height - 5}" fill="#666" font-size="12">Epoch 1</text>
-      <text x="${width - padding - 60}" y="${height - 5}" fill="#666" font-size="12">Epoch ${history[history.length-1].epoch}</text>
+      <!-- Grid Lines -->
+      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#222" />
+      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#222" />
+      
+      <!-- Area for valIoU -->
+      <path d="${areaPath}" fill="${COLORS.secondary}" fill-opacity="0.2" />
+      
+      <!-- Mission Ref -->
+      ${missionRefLine}
+      
+      <!-- Labels -->
+      <text x="${padding}" y="${height - 10}" fill="#666" font-size="10">Training Start</text>
+      <text x="${width - padding - 60}" y="${height - 10}" fill="#666" font-size="10">Latest Epoch</text>
+      <text x="5" y="${padding + 10}" fill="#444" font-size="10" transform="rotate(-90 5 ${padding + 10})">IoU / LOSS</text>
     </svg>
   `;
 };
@@ -60,10 +76,10 @@ export const generateMetricsBarSvg = (result: DetectionResult): string => {
     const y = i * rowHeight + padding;
     const barW = (width - padding * 2 - labelWidth) * m.val;
     bars += `
-      <text x="${padding}" y="${y + 20}" fill="#94A3B8" font-size="12" font-weight="bold">${m.label.toUpperCase()}</text>
+      <text x="${padding}" y="${y + 20}" fill="#94A3B8" font-size="11" font-weight="bold">${m.label.toUpperCase()}</text>
       <rect x="${padding + labelWidth}" y="${y}" width="${width - padding * 2 - labelWidth}" height="25" fill="#111" rx="4" />
       <rect x="${padding + labelWidth}" y="${y}" width="${barW}" height="25" fill="${m.color}" rx="4" />
-      <text x="${padding + labelWidth + barW + 10}" y="${y + 18}" fill="#fff" font-size="12">${(m.val * 100).toFixed(1)}%</text>
+      <text x="${padding + labelWidth + barW + 10}" y="${y + 18}" fill="#fff" font-size="12" font-weight="bold">${(m.val * 100).toFixed(1)}%</text>
     `;
   });
 
@@ -81,7 +97,7 @@ export const generateMetricsBarSvg = (result: DetectionResult): string => {
 export const generateRadarSvg = (metrics: MetricPoint[]): string => {
   const size = 400;
   const center = size / 2;
-  const radius = size * 0.4;
+  const radius = size * 0.35;
   const angleStep = (Math.PI * 2) / metrics.length;
 
   // Grid
@@ -92,7 +108,7 @@ export const generateRadarSvg = (metrics: MetricPoint[]): string => {
       const angle = i * angleStep;
       path += ` L ${center + radius * r * Math.cos(angle)} ${center + radius * r * Math.sin(angle)}`;
     }
-    grid += `<path d="${path}" fill="none" stroke="#222" stroke-width="1" />`;
+    grid += `<path d="${path} Z" fill="none" stroke="#1A1A1A" stroke-width="1" />`;
   });
 
   // Data Polygon
@@ -110,12 +126,12 @@ export const generateRadarSvg = (metrics: MetricPoint[]): string => {
     <svg width="100%" height="300" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#050505" />
       ${grid}
-      <path d="${polyPath}" fill="${COLORS.primary}" fill-opacity="0.4" stroke="${COLORS.primary}" stroke-width="2" />
+      <path d="${polyPath}" fill="${COLORS.primary}" fill-opacity="0.3" stroke="${COLORS.primary}" stroke-width="2" />
       ${metrics.map((m, i) => {
         const angle = i * angleStep;
-        const x = center + (radius + 20) * Math.cos(angle);
-        const y = center + (radius + 20) * Math.sin(angle);
-        return `<text x="${x}" y="${y}" fill="#666" font-size="10" text-anchor="middle" dominant-baseline="middle">${m.subject}</text>`;
+        const x = center + (radius + 25) * Math.cos(angle);
+        const y = center + (radius + 25) * Math.sin(angle);
+        return `<text x="${x}" y="${y}" fill="#555" font-size="9" text-anchor="middle" font-weight="bold">${m.subject.toUpperCase()}</text>`;
       }).join('')}
     </svg>
   `;

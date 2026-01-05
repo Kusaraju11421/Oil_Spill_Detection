@@ -2,38 +2,42 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { DetectionResult } from "../types";
 
-// Always use a direct initialization from process.env.API_KEY as per guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionResult> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API_KEY_NOT_FOUND: The maritime satellite uplink requires a valid API key in the environment.");
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("API_KEY_NOT_FOUND: The maritime satellite uplink requires a valid API key.");
   }
 
-  // Refined prompt to handle "False Positives" and strictly detect clean water scenarios.
-  const prompt = `
+  // Guidelines: Create a new instance right before making an API call.
+  const ai = new GoogleGenAI({ apiKey });
+
+  const systemInstruction = `
     ACT AS A SENIOR MARITIME SAR (SYNTHETIC APERTURE RADAR) ANALYST.
     
     CORE OBJECTIVE:
-    Identify oil spill anomalies in the provided imagery. 
-    CRITICAL: If the image contains clean water, natural wave patterns, or typical sea state reflections with NO clear oil anomalies, you MUST report "spillFound": false.
+    Identify oil spill anomalies in SAR imagery. 
+    
+    CRITICAL RULES FOR CLEAN WATER:
+    - If the image contains clean water, uniform sea state, or natural wave patterns with NO oil anomalies, "spillFound" MUST be false.
+    - Do not mistake natural slicks (biogenic), wind-shaded zones, or cloud shadows for oil.
+    - If "spillFound" is false: set "iou" to 0, "confidence" to the certainty of it being clean water, and ALL polygon arrays must be empty [].
 
-    SPECIFIC DETECTION RULES:
-    1. OIL CHARACTERISTICS: Oil spills typically appear as darker, smoother patches (lower backscatter) compared to the surrounding sea. They often have elongated, organic shapes following currents or ship wakes.
-    2. FALSE POSITIVE PREVENTION: Do not mistake look-alikes such as natural slicks, wind-shaded areas, or cloud shadows for oil. If there is any doubt or the water is clearly uniform, report NO spill.
-    3. NEGATIVE DETECTION: If no spill is found, "spillFound" must be false, "confidence" should be relative to the certainty of it being clean water, "iou" should be 0, and ALL polygon arrays must be empty [].
+    DETECTION CHARACTERISTICS:
+    - Oil spills: Smoother, darker patches (lower backscatter) with organic/elongated shapes.
+    - Land/Features: High backscatter, static structures.
 
-    TASK:
-    - DETECT contours of oil spills (predicted and ground truth).
-    - DETECT land or permanent maritime structures.
-    - GENERATE a technical briefing in JSON format.
+    Output MUST be a valid JSON matching the specified structure.
+  `;
 
-    JSON STRUCTURE:
+  const prompt = `
+    Analyze this maritime imagery for oil spill anomalies.
+    
+    JSON STRUCTURE REQUIRED:
     {
       "spillFound": boolean,
       "confidence": float (0.0 to 1.0),
       "iou": float (0.0 to 1.0),
-      "areaEstimate": string (e.g., "0 sq km" if none),
+      "areaEstimate": string,
       "groundTruthPolygons": [[{"x": percent, "y": percent}]], 
       "predictedPolygons": [[{"x": percent, "y": percent}]],
       "landPolygons": [[{"x": percent, "y": percent}]],
@@ -47,12 +51,9 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
       "radarMetrics": [{"subject": string, "value": number, "fullMark": number}],
       "inferencePath": [{"step": number, "probability": number}]
     }
-
-    Output ONLY the valid JSON.
   `;
 
   try {
-    // Using gemini-3-pro-preview for high-accuracy spatial reasoning tasks.
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
@@ -60,17 +61,18 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
           { inlineData: { data: imageBase64.split(',')[1], mimeType: 'image/jpeg' } },
           { text: prompt }
         ]
+      },
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json"
       }
     });
 
     const jsonStr = response.text;
-    if (!jsonStr) throw new Error("CORE_FAULT: Analysis payload not received.");
+    if (!jsonStr) throw new Error("CORE_FAULT: Analysis payload empty.");
 
-    const cleanedJson = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
-    const jsonMatch = cleanedJson.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("PARSING_ERROR: Invalid model output format.");
-
-    return JSON.parse(jsonMatch[0]) as DetectionResult;
+    // The response is already requested as JSON, so we just parse it.
+    return JSON.parse(jsonStr) as DetectionResult;
   } catch (error: any) {
     console.error("ANALYSIS_FAILURE:", error);
     throw error;

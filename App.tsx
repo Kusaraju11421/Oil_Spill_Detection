@@ -154,7 +154,7 @@ const App: React.FC = () => {
     if (!result) return alert("No mission data found. Please run analysis first.");
     
     // Generate Charts for the Report
-    const performanceSvg = generatePerformanceSvg(MOCK_TRAINING_HISTORY);
+    const performanceSvg = generatePerformanceSvg(MOCK_TRAINING_HISTORY, result);
     const metricsSvg = generateMetricsBarSvg(result);
     const radarSvg = generateRadarSvg(result.radarMetrics);
 
@@ -198,7 +198,7 @@ const App: React.FC = () => {
           <div class="section-title">Detection Analytics</div>
           <div class="charts-container">
             <div class="chart-box">
-              <div class="label">Training Performance History</div>
+              <div class="label">Training Performance History (IoU)</div>
               ${performanceSvg}
             </div>
             <div class="chart-box">
