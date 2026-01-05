@@ -16,6 +16,11 @@ import {
   HybridMetricChart, 
   AreaDensityChart 
 } from './components/MetricsChart';
+import { 
+  generatePerformanceSvg, 
+  generateMetricsBarSvg, 
+  generateRadarSvg 
+} from './utils/reportGenerator';
 
 const ANALYSIS_MESSAGES = [
   "CONNECTING TO ORBITAL NODE...",
@@ -148,6 +153,11 @@ const App: React.FC = () => {
   const exportReport = () => {
     if (!result) return alert("No mission data found. Please run analysis first.");
     
+    // Generate Charts for the Report
+    const performanceSvg = generatePerformanceSvg(MOCK_TRAINING_HISTORY);
+    const metricsSvg = generateMetricsBarSvg(result);
+    const radarSvg = generateRadarSvg(result.radarMetrics);
+
     const reportHtml = `
       <!DOCTYPE html>
       <html>
@@ -155,36 +165,61 @@ const App: React.FC = () => {
         <title>Oil Spill Detection Report - ${new Date().toLocaleDateString()}</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #fff; padding: 40px; }
-          .container { max-width: 900px; margin: 0 auto; border: 1px solid #0055FF; padding: 40px; border-radius: 20px; background: #050505; }
+          .container { max-width: 900px; margin: 0 auto; border: 1px solid #0055FF; padding: 40px; border-radius: 20px; background: #050505; box-shadow: 0 0 50px rgba(0, 85, 255, 0.2); }
           h1 { color: #0055FF; text-transform: uppercase; letter-spacing: 5px; border-bottom: 2px solid #0055FF; padding-bottom: 20px; text-align: center; }
           .metrics { display: flex; justify-content: space-between; margin-top: 40px; }
           .metric-box { text-align: center; flex: 1; padding: 20px; border-right: 1px solid #222; }
           .metric-box:last-child { border-right: none; }
-          .label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 10px; }
+          .label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 2px; }
           .value { font-size: 32px; font-weight: bold; color: #fff; }
-          .description { margin-top: 40px; background: #111; padding: 30px; border-radius: 10px; line-height: 1.6; font-style: italic; border-left: 5px solid #0055FF; }
+          .description { margin-top: 40px; background: #0A0A0A; padding: 30px; border-radius: 10px; line-height: 1.6; font-style: italic; border-left: 5px solid #0055FF; }
           .visuals { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px; }
-          .img-container { text-align: center; }
-          img { width: 100%; border-radius: 10px; border: 1px solid #333; margin-top: 10px; }
-          .footer { margin-top: 60px; text-align: center; color: #444; font-size: 10px; letter-spacing: 3px; }
+          .img-container { text-align: center; background: #050505; padding: 10px; border-radius: 10px; }
+          img { width: 100%; border-radius: 10px; border: 1px solid #1A1A1A; margin-top: 10px; }
+          .section-title { margin-top: 60px; font-size: 14px; text-transform: uppercase; letter-spacing: 4px; color: #0055FF; border-left: 3px solid #0055FF; padding-left: 15px; margin-bottom: 20px; }
+          .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+          .chart-box { background: #050505; border: 1px solid #111; padding: 20px; border-radius: 15px; }
+          .footer { margin-top: 80px; text-align: center; color: #333; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; }
         </style>
       </head>
       <body>
         <div class="container">
           <h1>Mission Report Dossier</h1>
+          
           <div class="metrics">
             <div class="metric-box"><div class="label">Confidence</div><div class="value">${(result.confidence * 100).toFixed(1)}%</div></div>
             <div class="metric-box"><div class="label">IoU Score</div><div class="value">${result.iou.toFixed(3)}</div></div>
             <div class="metric-box"><div class="label">Area Estimate</div><div class="value">${result.areaEstimate}</div></div>
           </div>
+
+          <div class="section-title">Strategic Summary</div>
           <div class="description">"${result.description}"</div>
-          <div class="visuals">
-            <div class="img-container"><div class="label">SAR Source</div><img src="${result.visuals?.input}"/></div>
-            <div class="img-container"><div class="label">Ground Truth</div><img src="${result.visuals?.mask}"/></div>
-            <div class="img-container"><div class="label">Model Prediction</div><img src="${result.visuals?.predicted}"/></div>
-            <div class="img-container"><div class="label">Fused Overlay</div><img src="${result.visuals?.overlay}"/></div>
+
+          <div class="section-title">Detection Analytics</div>
+          <div class="charts-container">
+            <div class="chart-box">
+              <div class="label">Training Performance History</div>
+              ${performanceSvg}
+            </div>
+            <div class="chart-box">
+              <div class="label">Mission Fidelity Comparison</div>
+              ${metricsSvg}
+            </div>
+            <div class="chart-box" style="grid-column: span 2;">
+              <div class="label">Radar Spectral Signature</div>
+              <div style="display: flex; justify-content: center;">${radarSvg}</div>
+            </div>
           </div>
-          <div class="footer">SENTINEL SURVEILLANCE CORE &copy; 2025</div>
+
+          <div class="section-title">Tactical Imagery Assets</div>
+          <div class="visuals">
+            <div class="img-container"><div class="label">SAR Source Uplink</div><img src="${result.visuals?.input}"/></div>
+            <div class="img-container"><div class="label">Ground Truth Reference</div><img src="${result.visuals?.mask}"/></div>
+            <div class="img-container"><div class="label">AI Model Prediction</div><img src="${result.visuals?.predicted}"/></div>
+            <div class="img-container"><div class="label">Neural Fusion Overlay</div><img src="${result.visuals?.overlay}"/></div>
+          </div>
+
+          <div class="footer">SENTINEL SURVEILLANCE CORE • CLASSIFIED DATA • &copy; 2025</div>
         </div>
       </body>
       </html>
@@ -194,7 +229,7 @@ const App: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Oil_Spill_Report_${Date.now()}.html`;
+    a.download = `Oil_Spill_Mission_Report_${Date.now()}.html`;
     a.click();
     URL.revokeObjectURL(url);
   };
