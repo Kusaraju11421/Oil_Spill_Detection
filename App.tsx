@@ -135,7 +135,7 @@ const App: React.FC = () => {
       });
       
       setActiveMenu('View Results');
-      addLog("MISSION DATA SECURED. RESULTS READY.");
+      addLog(res.spillFound ? "MISSION DATA SECURED. SPILL IDENTIFIED." : "ANALYSIS COMPLETE. CLEAN WATER DETECTED.");
     } catch (e: any) {
       console.error(e);
       addLog(`CRITICAL ERROR: ${e.message || "Uplink failure."}`);
@@ -313,10 +313,18 @@ const App: React.FC = () => {
                {activeMenu === 'View Results' && result && result.visuals && (
                  <div className="space-y-10">
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                     <div className="glass-panel p-10 rounded-[2rem] border-l-4 border-[#0055FF]"><p className="text-[11px] font-bold text-white/30 uppercase mb-3 tracking-widest">Confidence</p><p className="text-5xl font-cinzel text-white font-black">{(result.confidence * 100).toFixed(0)}%</p></div>
+                     <div className={`glass-panel p-10 rounded-[2rem] border-l-4 ${result.spillFound ? 'border-[#0055FF]' : 'border-green-500'}`}><p className="text-[11px] font-bold text-white/30 uppercase mb-3 tracking-widest">Confidence</p><p className="text-5xl font-cinzel text-white font-black">{(result.confidence * 100).toFixed(0)}%</p></div>
                      <div className="glass-panel p-10 rounded-[2rem] border-l-4 border-white/20"><p className="text-[11px] font-bold text-white/30 uppercase mb-3 tracking-widest">IoU Fidelity</p><p className="text-5xl font-cinzel text-white font-black">{result.iou.toFixed(3)}</p></div>
                      <div className="glass-panel p-10 rounded-[2rem] border-l-4 border-white/10"><p className="text-[11px] font-bold text-white/30 uppercase mb-3 tracking-widest">Spill Area</p><p className="text-5xl font-cinzel text-white font-black">{result.areaEstimate}</p></div>
                    </div>
+                   
+                   {!result.spillFound && (
+                     <div className="glass-panel p-8 rounded-2xl bg-green-500/5 border border-green-500/20 text-green-400 flex items-center gap-4">
+                       <i className="fa-solid fa-circle-check text-2xl"></i>
+                       <span className="text-xs font-bold uppercase tracking-widest">MISSION STATUS: CLEAR WATER IDENTIFIED. NO OIL ANOMALIES DETECTED.</span>
+                     </div>
+                   )}
+
                    <div className="glass-panel p-12 rounded-[3.5rem]">
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
                         {[
@@ -329,6 +337,11 @@ const App: React.FC = () => {
                             <span className="text-[10px] font-normal text-white/40 font-lexend uppercase tracking-widest">{item.label}</span>
                             <div className="aspect-square bg-black border border-white/10 rounded-3xl overflow-hidden cursor-zoom-in relative group" onClick={() => item.src && setPreviewImage(item.src)}>
                               <img src={item.src} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                              {!result.spillFound && i > 0 && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                                  <span className="text-[8px] font-bold text-white/40 uppercase tracking-[0.3em]">NO_DATA</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
