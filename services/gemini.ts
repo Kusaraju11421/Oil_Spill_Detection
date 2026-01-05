@@ -9,6 +9,7 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
   }
 
   // Guidelines: Create a new instance right before making an API call.
+  // Using gemini-3-flash-preview to mitigate quota limits seen with the Pro model in the free tier.
   const ai = new GoogleGenAI({ apiKey });
 
   const systemInstruction = `
@@ -55,7 +56,7 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           { inlineData: { data: imageBase64.split(',')[1], mimeType: 'image/jpeg' } },
@@ -71,10 +72,16 @@ export const analyzeOilSpill = async (imageBase64: string): Promise<DetectionRes
     const jsonStr = response.text;
     if (!jsonStr) throw new Error("CORE_FAULT: Analysis payload empty.");
 
-    // The response is already requested as JSON, so we just parse it.
+    // The response is already requested as JSON via responseMimeType, so we just parse it.
     return JSON.parse(jsonStr) as DetectionResult;
   } catch (error: any) {
     console.error("ANALYSIS_FAILURE:", error);
+    
+    // Provide a clearer message if we hit quota limits (RESOURCE_EXHAUSTED)
+    if (error.message?.includes("quota") || error.status === "RESOURCE_EXHAUSTED" || error.message?.includes("429")) {
+      throw new Error("SATELLITE_QUOTA_EXHAUSTED: Uplink limit reached for the current project. Please try again in a few minutes.");
+    }
+    
     throw error;
   }
 };
