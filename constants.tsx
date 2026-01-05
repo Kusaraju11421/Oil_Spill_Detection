@@ -5,12 +5,12 @@ export const COLORS = {
   primary: '#FF5100',    // Vibrant Orange
   secondary: '#FF8200',  // Warm Orange
   success: '#FFC929',    // Gold
-  danger: '#EF4444',     // Red (Kept for alerts)
-  info: '#FF8200',       // Warm Orange
-  white: '#FFF4D5',      // Cream
-  dark: '#0A0903',       // Black/Brown
-  text: '#FFF4D5',       // Cream Text
-  border: 'rgba(255, 81, 0, 0.2)' 
+  danger: '#EF4444',     // Red
+  info: '#FF8200',       
+  white: '#FFFFFF',      
+  dark: '#0A0903',       
+  text: '#0A0903',       
+  border: 'rgba(255, 81, 0, 0.1)' 
 };
 
 export const MOCK_TRAINING_HISTORY: TrainingMetricPoint[] = [

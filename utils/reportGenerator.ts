@@ -26,20 +26,20 @@ export const generatePerformanceSvg = (history: TrainingMetricPoint[], result?: 
   if (result) {
     const missionY = getY(result.iou);
     missionRefLine = `
-      <line x1="${padding}" y1="${missionY}" x2="${width - padding}" y2="${missionY}" stroke="${COLORS.success}" stroke-width="2" stroke-dasharray="5,5" />
-      <text x="${width - padding - 100}" y="${missionY - 5}" fill="${COLORS.success}" font-size="10" font-weight="bold">MISSION IoU</text>
+      <line x1="${padding}" y1="${missionY}" x2="${width - padding}" y2="${missionY}" stroke="#2ECC71" stroke-width="2" stroke-dasharray="5,5" />
+      <text x="${width - padding - 100}" y="${missionY - 5}" fill="#2ECC71" font-size="10" font-weight="bold">MISSION IoU</text>
     `;
   }
 
   return `
     <svg width="100%" height="200" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#050505" />
-      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#1a1914" />
-      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#1a1914" />
+      <rect width="100%" height="100%" fill="#ffffff" />
+      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#eee" />
+      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#eee" />
       <path d="${areaPath}" fill="${COLORS.primary}" fill-opacity="0.1" stroke="${COLORS.primary}" stroke-width="2" />
       ${missionRefLine}
-      <text x="${padding}" y="${height - 10}" fill="rgba(255, 244, 213, 0.2)" font-size="10">Training Start</text>
-      <text x="${width - padding - 60}" y="${height - 10}" fill="rgba(255, 244, 213, 0.2)" font-size="10">Latest Epoch</text>
+      <text x="${padding}" y="${height - 10}" fill="#999" font-size="10">Training Start</text>
+      <text x="${width - padding - 60}" y="${height - 10}" fill="#999" font-size="10">Latest Epoch</text>
     </svg>
   `;
 };
@@ -55,7 +55,7 @@ export const generateMetricsBarSvg = (result: DetectionResult): string => {
   
   const metrics = [
     { label: 'Confidence', val: result.confidence, color: COLORS.primary },
-    { label: 'IoU Fidelity', val: result.iou, color: COLORS.success },
+    { label: 'IoU Fidelity', val: result.iou, color: COLORS.secondary },
     { label: 'Segmentation', val: result.technicalDetails.segmentationFidelity, color: COLORS.secondary }
   ];
 
@@ -64,16 +64,16 @@ export const generateMetricsBarSvg = (result: DetectionResult): string => {
     const y = i * rowHeight + padding;
     const barW = (width - padding * 2 - labelWidth) * m.val;
     bars += `
-      <text x="${padding}" y="${y + 20}" fill="rgba(255, 244, 213, 0.4)" font-size="11" font-weight="bold">${m.label.toUpperCase()}</text>
-      <rect x="${padding + labelWidth}" y="${y}" width="${width - padding * 2 - labelWidth}" height="25" fill="#0c0b06" rx="4" />
+      <text x="${padding}" y="${y + 20}" fill="#999" font-size="11" font-weight="bold">${m.label.toUpperCase()}</text>
+      <rect x="${padding + labelWidth}" y="${y}" width="${width - padding * 2 - labelWidth}" height="25" fill="#f9f9f9" rx="4" />
       <rect x="${padding + labelWidth}" y="${y}" width="${barW}" height="25" fill="${m.color}" rx="4" />
-      <text x="${padding + labelWidth + barW + 10}" y="${y + 18}" fill="#FFF4D5" font-size="12" font-weight="bold">${(m.val * 100).toFixed(1)}%</text>
+      <text x="${padding + labelWidth + barW + 10}" y="${y + 18}" fill="#0A0903" font-size="12" font-weight="bold">${(m.val * 100).toFixed(1)}%</text>
     `;
   });
 
   return `
     <svg width="100%" height="${metrics.length * rowHeight + padding}" viewBox="0 0 ${width} ${metrics.length * rowHeight + padding}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#050505" />
+      <rect width="100%" height="100%" fill="#ffffff" />
       ${bars}
     </svg>
   `;
@@ -95,7 +95,7 @@ export const generateRadarSvg = (metrics: MetricPoint[]): string => {
       const angle = i * angleStep;
       path += ` L ${center + radius * r * Math.cos(angle)} ${center + radius * r * Math.sin(angle)}`;
     }
-    grid += `<path d="${path} Z" fill="none" stroke="#1a1914" stroke-width="1" />`;
+    grid += `<path d="${path} Z" fill="none" stroke="#eee" stroke-width="1" />`;
   });
 
   let polyPath = '';
@@ -110,14 +110,14 @@ export const generateRadarSvg = (metrics: MetricPoint[]): string => {
 
   return `
     <svg width="100%" height="300" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#050505" />
+      <rect width="100%" height="100%" fill="#ffffff" />
       ${grid}
       <path d="${polyPath}" fill="${COLORS.primary}" fill-opacity="0.2" stroke="${COLORS.primary}" stroke-width="2" />
       ${metrics.map((m, i) => {
         const angle = i * angleStep;
         const x = center + (radius + 25) * Math.cos(angle);
         const y = center + (radius + 25) * Math.sin(angle);
-        return `<text x="${x}" y="${y}" fill="rgba(255, 244, 213, 0.4)" font-size="9" text-anchor="middle" font-weight="bold">${m.subject.toUpperCase()}</text>`;
+        return `<text x="${x}" y="${y}" fill="#999" font-size="9" text-anchor="middle" font-weight="bold">${m.subject.toUpperCase()}</text>`;
       }).join('')}
     </svg>
   `;
