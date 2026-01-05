@@ -1,16 +1,15 @@
-
 import { TrainingMetricPoint } from './types';
 
 export const COLORS = {
-  primary: '#FF5100',    // Vibrant Orange
-  secondary: '#FF8200',  // Warm Orange
-  success: '#FFC929',    // Gold
-  danger: '#EF4444',     // Red
-  info: '#FF8200',       
-  white: '#FFFFFF',      
-  dark: '#0A0903',       
-  text: '#0A0903',       
-  border: 'rgba(255, 81, 0, 0.1)' 
+  primary: '#0055FF', // Electric Blue
+  secondary: '#E4E4E4', // Silver Mist
+  danger: '#FF0000', // Pure Red
+  warning: '#FF4D00', // Neon Orange (Accent)
+  dark: '#000000', // Pure Black
+  surface: '#0A0A0A', // Near Black Surface
+  lightGray: '#94A3B8', 
+  gray: '#475569', 
+  border: '#1E293B' 
 };
 
 export const MOCK_TRAINING_HISTORY: TrainingMetricPoint[] = [
