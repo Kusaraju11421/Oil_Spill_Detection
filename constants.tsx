@@ -2,15 +2,15 @@
 import { TrainingMetricPoint } from './types';
 
 export const COLORS = {
-  primary: '#F97316', // Orange
-  secondary: '#0A192F', // Navy Blue
-  success: '#4ADE80', // Light Green
-  danger: '#EF4444', // Red
-  info: '#0055FF', // Blue
-  white: '#FFFFFF', // White
-  dark: '#000000', // Black
-  text: '#F1F5F9', // Slate Light text
-  border: 'rgba(249, 115, 22, 0.2)' // Orange tint border
+  primary: '#FF5100',    // Vibrant Orange
+  secondary: '#FF8200',  // Warm Orange
+  success: '#FFC929',    // Gold
+  danger: '#EF4444',     // Red (Kept for alerts)
+  info: '#FF8200',       // Warm Orange
+  white: '#FFF4D5',      // Cream
+  dark: '#0A0903',       // Black/Brown
+  text: '#FFF4D5',       // Cream Text
+  border: 'rgba(255, 81, 0, 0.2)' 
 };
 
 export const MOCK_TRAINING_HISTORY: TrainingMetricPoint[] = [

@@ -22,18 +22,18 @@ export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = (
               <stop offset="95%" stopColor={COLORS.danger} stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a1914" vertical={false} />
           <XAxis 
             dataKey="epoch" 
-            stroke="#94a3b8" 
+            stroke="rgba(255, 244, 213, 0.4)" 
             fontSize={12} 
             tickLine={false} 
             axisLine={false} 
           />
-          <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+          <YAxis stroke="rgba(255, 244, 213, 0.4)" fontSize={12} tickLine={false} axisLine={false} />
           <Tooltip 
-            contentStyle={{ backgroundColor: '#0A192F', border: '1px solid rgba(249, 115, 22, 0.2)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
-            itemStyle={{ fontSize: '12px', color: '#F1F5F9' }}
+            contentStyle={{ backgroundColor: '#0c0b06', border: '1px solid rgba(255, 81, 0, 0.2)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
+            itemStyle={{ fontSize: '12px', color: '#FFF4D5' }}
           />
           <Legend wrapperStyle={{ paddingTop: '20px' }} />
           <Area 
@@ -85,7 +85,7 @@ export const MetricsBarChart: React.FC<{ result?: DetectionResult | null }> = ({
     { 
       name: 'Fidelity Score', 
       value: result ? result.technicalDetails.segmentationFidelity : 0.85, 
-      color: COLORS.info 
+      color: COLORS.secondary 
     }
   ];
 
@@ -93,12 +93,12 @@ export const MetricsBarChart: React.FC<{ result?: DetectionResult | null }> = ({
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart layout="vertical" data={data} margin={{ left: 40, right: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a1914" horizontal={false} />
           <XAxis type="number" domain={[0, 1]} hide />
-          <YAxis type="category" dataKey="name" stroke="#94A3B8" fontSize={10} width={100} tickLine={false} />
+          <YAxis type="category" dataKey="name" stroke="rgba(255, 244, 213, 0.4)" fontSize={10} width={100} tickLine={false} />
           <Tooltip 
-             contentStyle={{ backgroundColor: '#0A192F', border: '1px solid rgba(249, 115, 22, 0.2)', borderRadius: '8px' }}
-             itemStyle={{ color: '#F1F5F9' }}
+             contentStyle={{ backgroundColor: '#0c0b06', border: '1px solid rgba(255, 81, 0, 0.2)', borderRadius: '8px' }}
+             itemStyle={{ color: '#FFF4D5' }}
           />
           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
             {data.map((entry, index) => (
@@ -117,11 +117,11 @@ export const ScatterPathChart: React.FC<{ result: DetectionResult }> = ({ result
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <CartesianGrid stroke="#1e293b" />
-          <XAxis type="number" dataKey="x" name="Step" stroke="#94a3b8" unit="" fontSize={10} />
-          <YAxis type="number" dataKey="y" name="Confidence" stroke="#94a3b8" unit="%" fontSize={10} />
+          <CartesianGrid stroke="#1a1914" />
+          <XAxis type="number" dataKey="x" name="Step" stroke="rgba(255, 244, 213, 0.4)" unit="" fontSize={10} />
+          <YAxis type="number" dataKey="y" name="Confidence" stroke="rgba(255, 244, 213, 0.4)" unit="%" fontSize={10} />
           <ZAxis type="number" dataKey="z" range={[60, 400]} />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#0A192F', border: '1px solid rgba(249, 115, 22, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#F1F5F9' }} />
+          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#0c0b06', border: '1px solid rgba(255, 81, 0, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#FFF4D5' }} />
           <Scatter name="Path" data={data} fill={COLORS.primary} line stroke={COLORS.primary} strokeWidth={2} />
         </ScatterChart>
       </ResponsiveContainer>
@@ -140,11 +140,11 @@ export const HybridMetricChart: React.FC<{ result?: DetectionResult | null }> = 
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data}>
-          <CartesianGrid stroke="#1e293b" vertical={false} />
-          <XAxis dataKey="epoch" stroke="#94a3b8" fontSize={10} />
-          <YAxis yAxisId="left" stroke="#94a3b8" fontSize={10} />
-          <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={10} />
-          <Tooltip contentStyle={{ backgroundColor: '#0A192F', border: '1px solid rgba(249, 115, 22, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#F1F5F9' }} />
+          <CartesianGrid stroke="#1a1914" vertical={false} />
+          <XAxis dataKey="epoch" stroke="rgba(255, 244, 213, 0.4)" fontSize={10} />
+          <YAxis yAxisId="left" stroke="rgba(255, 244, 213, 0.4)" fontSize={10} />
+          <YAxis yAxisId="right" orientation="right" stroke="rgba(255, 244, 213, 0.4)" fontSize={10} />
+          <Tooltip contentStyle={{ backgroundColor: '#0c0b06', border: '1px solid rgba(255, 81, 0, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#FFF4D5' }} />
           <Legend />
           <Bar yAxisId="left" dataKey="valAccuracy" name="History Accuracy %" fill={COLORS.primary} fillOpacity={0.1} radius={[4, 4, 0, 0]} />
           {result && (
@@ -178,10 +178,10 @@ export const AreaDensityChart: React.FC<{ result: DetectionResult }> = ({ result
               <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a1914" vertical={false} />
           <XAxis dataKey="name" hide />
-          <YAxis stroke="#94a3b8" fontSize={10} />
-          <Tooltip contentStyle={{ backgroundColor: '#0A192F', border: '1px solid rgba(249, 115, 22, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#F1F5F9' }} />
+          <YAxis stroke="rgba(255, 244, 213, 0.4)" fontSize={10} />
+          <Tooltip contentStyle={{ backgroundColor: '#0c0b06', border: '1px solid rgba(255, 81, 0, 0.2)', borderRadius: '8px' }} itemStyle={{ color: '#FFF4D5' }} />
           <Area type="monotone" dataKey="density" name="Reflective Density" stroke={COLORS.primary} fillOpacity={1} fill="url(#colorDensity)" strokeWidth={2} />
         </AreaChart>
       </ResponsiveContainer>
