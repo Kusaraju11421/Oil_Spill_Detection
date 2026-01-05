@@ -233,11 +233,16 @@ const App: React.FC = () => {
       
       <div className="landing-background pointer-events-none">
         <div className="glow-mesh"></div><div className="grid-layer"></div>
-        <div className="spread-ripple opacity-30"></div><div className="spread-ripple spread-ripple-2"></div>
+        <div className="spread-ripple opacity-30"></div>
+        <div className="spread-ripple spread-ripple-2"></div>
+        <div className="spread-ripple spread-ripple-3"></div>
         <div className="wave-container">
           <div className="fluid-wave fluid-wave-1"></div>
           <div className="fluid-wave fluid-wave-2"></div>
           <div className="fluid-wave fluid-wave-3"></div>
+          <div className="fluid-wave fluid-wave-4"></div>
+          <div className="fluid-wave fluid-wave-5"></div>
+          <div className="fluid-wave fluid-wave-6"></div>
         </div>
       </div>
 
