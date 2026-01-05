@@ -14,15 +14,15 @@ export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = (
         <AreaChart data={MOCK_TRAINING_HISTORY}>
           <defs>
             <linearGradient id="colorIoU" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8}/>
+              <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.2}/>
               <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0}/>
             </linearGradient>
             <linearGradient id="colorLoss" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={COLORS.danger} stopOpacity={0.3}/>
+              <stop offset="5%" stopColor={COLORS.danger} stopOpacity={0.1}/>
               <stop offset="95%" stopColor={COLORS.danger} stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
           <XAxis 
             dataKey="epoch" 
             stroke="#94a3b8" 
@@ -32,8 +32,8 @@ export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = (
           />
           <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
           <Tooltip 
-            contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
-            itemStyle={{ fontSize: '12px' }}
+            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+            itemStyle={{ fontSize: '12px', color: '#1E293B' }}
           />
           <Legend wrapperStyle={{ paddingTop: '20px' }} />
           <Area 
@@ -50,7 +50,7 @@ export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = (
               y={result.iou} 
               stroke={COLORS.primary} 
               strokeDasharray="3 3" 
-              label={{ position: 'top', value: 'Current Mission', fill: COLORS.primary, fontSize: 10 }} 
+              label={{ position: 'top', value: 'Current Mission', fill: COLORS.primary, fontSize: 10, fontWeight: 'bold' }} 
             />
           )}
           <Area 
@@ -69,7 +69,6 @@ export const PerformanceChart: React.FC<{ result?: DetectionResult | null }> = (
 };
 
 export const MetricsBarChart: React.FC<{ result?: DetectionResult | null }> = ({ result }) => {
-  // Use real result data if available, otherwise fallback to final mock point
   const final = MOCK_TRAINING_HISTORY[MOCK_TRAINING_HISTORY.length - 1];
   
   const data = [
@@ -94,11 +93,11 @@ export const MetricsBarChart: React.FC<{ result?: DetectionResult | null }> = ({
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart layout="vertical" data={data} margin={{ left: 40, right: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
           <XAxis type="number" domain={[0, 1]} hide />
-          <YAxis type="category" dataKey="name" stroke="#f8fafc" fontSize={10} width={100} />
+          <YAxis type="category" dataKey="name" stroke="#64748B" fontSize={10} width={100} tickLine={false} />
           <Tooltip 
-             contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
+             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '8px' }}
           />
           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
             {data.map((entry, index) => (
@@ -117,11 +116,11 @@ export const ScatterPathChart: React.FC<{ result: DetectionResult }> = ({ result
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <CartesianGrid stroke="#334155" />
+          <CartesianGrid stroke="#E2E8F0" />
           <XAxis type="number" dataKey="x" name="Step" stroke="#94a3b8" unit="" fontSize={10} />
           <YAxis type="number" dataKey="y" name="Confidence" stroke="#94a3b8" unit="%" fontSize={10} />
           <ZAxis type="number" dataKey="z" range={[60, 400]} />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none' }} />
+          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0' }} />
           <Scatter name="Path" data={data} fill={COLORS.primary} line stroke={COLORS.primary} strokeWidth={2} />
         </ScatterChart>
       </ResponsiveContainer>
@@ -130,7 +129,6 @@ export const ScatterPathChart: React.FC<{ result: DetectionResult }> = ({ result
 };
 
 export const HybridMetricChart: React.FC<{ result?: DetectionResult | null }> = ({ result }) => {
-  // If we have a result, we show the training history but highlight the current mission's performance relative to it
   const data = MOCK_TRAINING_HISTORY.map((item, idx) => ({
     ...item,
     currentMissionIoU: result ? result.iou : null,
@@ -141,19 +139,19 @@ export const HybridMetricChart: React.FC<{ result?: DetectionResult | null }> = 
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data}>
-          <CartesianGrid stroke="#334155" vertical={false} />
+          <CartesianGrid stroke="#E2E8F0" vertical={false} />
           <XAxis dataKey="epoch" stroke="#94a3b8" fontSize={10} />
           <YAxis yAxisId="left" stroke="#94a3b8" fontSize={10} />
           <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={10} />
-          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none' }} />
+          <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0' }} />
           <Legend />
-          <Bar yAxisId="left" dataKey="valAccuracy" name="History Accuracy %" fill={COLORS.primary} fillOpacity={0.3} radius={[4, 4, 0, 0]} />
+          <Bar yAxisId="left" dataKey="valAccuracy" name="History Accuracy %" fill={COLORS.primary} fillOpacity={0.1} radius={[4, 4, 0, 0]} />
           {result && (
              <Line yAxisId="left" type="monotone" dataKey="currentConfidence" name="Current Confidence" stroke={COLORS.warning} strokeWidth={4} dot={{ r: 8, fill: COLORS.warning }} />
           )}
           <Line yAxisId="right" type="monotone" dataKey="trainLoss" name="Model Loss History" stroke={COLORS.danger} strokeWidth={2} dot={{ r: 4 }} />
           {result && (
-            <ReferenceLine yAxisId="left" y={result.iou * 100} stroke={COLORS.secondary} label="Mission IoU" strokeDasharray="3 3" />
+            <ReferenceLine yAxisId="left" y={result.iou * 100} stroke={COLORS.secondary} label={{ position: 'right', value: 'Mission IoU', fill: COLORS.secondary, fontSize: 10 }} strokeDasharray="3 3" />
           )}
         </ComposedChart>
       </ResponsiveContainer>
@@ -162,7 +160,6 @@ export const HybridMetricChart: React.FC<{ result?: DetectionResult | null }> = 
 };
 
 export const AreaDensityChart: React.FC<{ result: DetectionResult }> = ({ result }) => {
-  // Generate a bell-curve like distribution based on the spill area for visual density
   const areaValue = parseFloat(result.areaEstimate.replace(/[^0-9.]/g, '')) || 50;
   const densityData = Array.from({ length: 20 }, (_, i) => {
     const x = i - 10;
@@ -176,14 +173,14 @@ export const AreaDensityChart: React.FC<{ result: DetectionResult }> = ({ result
         <AreaChart data={densityData}>
           <defs>
             <linearGradient id="colorDensity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8}/>
+              <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3}/>
               <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
           <XAxis dataKey="name" hide />
           <YAxis stroke="#94a3b8" fontSize={10} />
-          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none' }} />
+          <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0' }} />
           <Area type="monotone" dataKey="density" name="Reflective Density" stroke={COLORS.primary} fillOpacity={1} fill="url(#colorDensity)" strokeWidth={2} />
         </AreaChart>
       </ResponsiveContainer>
